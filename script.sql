@@ -40,6 +40,12 @@ CREATE TABLE agendamentos (
         ON DELETE CASCADE ON UPDATE CASCADE
 );
 
+-- Usuarios de teste: admin@oficina.com / 123456
+INSERT INTO usuarios (nome, email, senha) VALUES
+('Administrador', 'admin@oficina.com', '$2a$10$3jLjOS4/vbPxxrSOttbC6uDgmSSbhOu8QS/.iW5Ik4uyUhEvi8CFq'),
+('Carlos Mecanico', 'carlos@oficina.com', '$2a$10$3jLjOS4/vbPxxrSOttbC6uDgmSSbhOu8QS/.iW5Ik4uyUhEvi8CFq'),
+('Fernanda Atendente', 'fernanda@oficina.com', '$2a$10$3jLjOS4/vbPxxrSOttbC6uDgmSSbhOu8QS/.iW5Ik4uyUhEvi8CFq');
+
 INSERT INTO clientes (nome, cpf, telefone, email) VALUES
 ('Carlos Eduardo Silva', '12345678901', '(11) 98765-4321', 'carlos.silva@email.com'),
 ('Mariana Souza Lima', '98765432100', '(11) 91234-5678', 'mariana.lima@email.com'),
