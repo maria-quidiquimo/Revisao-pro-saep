@@ -51,9 +51,9 @@ INSERT INTO usuarios (nome, email, senha) VALUES
 
 -- Os CPFs abaixo estão criptografados usando a chave secreta configurada no server.js
 INSERT INTO clientes (nome, cpf_criptografado, telefone, email) VALUES 
-('Cecilia Meireles', '9f86d081884c7d659a2feaa0c55ad015:a1b2c3d4e5f60718293a4b5c6d7e8f90', '(11) 98765-4321', 'carlos@email.com'),
-('Fernando Pessoa', '9f86d081884c7d659a2feaa0c55ad015:b2c3d4e5f60718293a4b5c6d7e8f90a1', '(11) 91234-5678', 'fernanda@email.com'),
-('Renata Cassia', '9f86d081884c7d659a2feaa0c55ad015:c3d4e5f60718293a4b5c6d7e8f90a1b2', '(11) 99988-7766', 'rafael@email.com');
+('Cecilia Meireles', '9f86d081884c7d659a2feaa0c55ad015:a1b2c3d4e5f60718293a4b5c6d7e8f90', '(11) 98765-4321', 'cecilia@email.com'),
+('Fernando Pessoa', '9f86d081884c7d659a2feaa0c55ad015:b2c3d4e5f60718293a4b5c6d7e8f90a1', '(11) 91234-5678', 'fernando@email.com'),
+('Renata Cassia', '9f86d081884c7d659a2feaa0c55ad015:c3d4e5f60718293a4b5c6d7e8f90a1b2', '(11) 99988-7766', 'renata@email.com');
 
 INSERT INTO projetos (cliente_id, titulo, descricao, local_corpo, valor_estimado) VALUES 
 (2, 'Dragão Oriental', 'Fechamento de braço estilo irezumi colorido', 'Braço Direito', 2500.00),
