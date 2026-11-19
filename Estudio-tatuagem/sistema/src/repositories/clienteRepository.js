@@ -1,27 +1,32 @@
 const db = require('../config/db');
 
-async function listar() {
-  const [rows] = await db.execute('SELECT id, nome, cpf_criptografado, telefone, email FROM clientes');
-  return rows;
+class ClienteRepository {
+    async listar(termo = '') {
+        if (termo) {
+            const [rows] = await db.query(
+                'SELECT * FROM clientes WHERE nome LIKE ? OR email LIKE ? OR telefone LIKE ?',
+                [`%${termo}%`, `%${termo}%`, `%${termo}%`]
+            );
+            return rows;
+        }
+        const [rows] = await db.query('SELECT * FROM clientes');
+        return rows;
+    }
+
+    async criar({ nome, cpf, telefone, email }) {
+        const [result] = await db.query(
+            'INSERT INTO clientes (nome, cpf, telefone, email) VALUES (?, ?, ?, ?)',
+            [nome, cpf, telefone, email]
+        );
+        return result.insertId;
+    }
+
+    async atualizar(id, { nome, cpf, telefone, email }) {
+        await db.query(
+            'UPDATE clientes SET nome = ?, cpf = ?, telefone = ?, email = ? WHERE id = ?',
+            [nome, cpf, telefone, email, id]
+        );
+    }
 }
 
-async function criar(cliente) {
-  const [result] = await db.execute(
-    'INSERT INTO clientes (nome, cpf_criptografado, telefone, email) VALUES (?, ?, ?, ?)',
-    [cliente.nome, cliente.cpf_criptografado, cliente.telefone, cliente.email]
-  );
-  return { id: result.insertId, ...cliente };
-}
-
-async function atualizar(id, cliente) {
-  await db.execute(
-    'UPDATE clientes SET nome = ?, cpf_criptografado = ?, telefone = ?, email = ? WHERE id = ?',
-    [cliente.nome, cliente.cpf_criptografado, cliente.telefone, cliente.email, id]
-  );
-}
-
-async function deletar(id) {
-  await db.execute('DELETE FROM clientes WHERE id = ?', [id]);
-}
-
-module.exports = { listar, criar, atualizar, deletar };
+module.exports = new ClienteRepository();

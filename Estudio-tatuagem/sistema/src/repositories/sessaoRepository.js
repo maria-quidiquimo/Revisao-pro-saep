@@ -1,30 +1,42 @@
 const db = require('../config/db');
 
-async function listar() {
-  const [rows] = await db.execute(
-    `SELECT s.*, p.titulo AS projeto_titulo
-     FROM sessoes s JOIN projetos p ON p.id = s.projeto_id`
-  );
-  return rows;
+class SessaoRepository {
+    async listarOrdenadoPorData() {
+        const [rows] = await db.query(`
+            SELECT 
+                s.id AS sessao_id,
+                s.data_sessao,
+                s.status,
+                s.observacoes,
+                p.id AS projeto_id,
+                p.titulo AS projeto_titulo,
+                p.descricao AS projeto_descricao,
+                p.local_corpo,
+                p.valor_estimado,
+                c.id AS cliente_id,
+                c.nome AS cliente_nome,
+                c.cpf AS cliente_cpf,
+                c.telefone AS cliente_telefone,
+                c.email AS cliente_email
+            FROM sessoes s
+            INNER JOIN projetos p ON s.projeto_id = p.id
+            INNER JOIN clientes c ON p.cliente_id = c.id
+            ORDER BY s.data_sessao ASC
+        `);
+        return rows;
+    }
+
+    async criar({ data_sessao, status, observacoes, projeto_id }) {
+        const [result] = await db.query(
+            'INSERT INTO sessoes (data_sessao, status, observacoes, projeto_id) VALUES (?, ?, ?, ?)',
+            [data_sessao, status || 'Agendada', observacoes, projeto_id]
+        );
+        return result.insertId;
+    }
+
+    async atualizarData(id, data_sessao) {
+        await db.query('UPDATE sessoes SET data_sessao = ? WHERE id = ?', [data_sessao, id]);
+    }
 }
 
-async function criar(sessao) {
-  const [result] = await db.execute(
-    'INSERT INTO sessoes (projeto_id, data_sessao, horario, status) VALUES (?, ?, ?, ?)',
-    [sessao.projeto_id, sessao.data_sessao, sessao.horario, sessao.status || 'Agendada']
-  );
-  return { id: result.insertId, ...sessao };
-}
-
-async function atualizar(id, sessao) {
-  await db.execute(
-    'UPDATE sessoes SET projeto_id = ?, data_sessao = ?, horario = ?, status = ? WHERE id = ?',
-    [sessao.projeto_id, sessao.data_sessao, sessao.horario, sessao.status, id]
-  );
-}
-
-async function deletar(id) {
-  await db.execute('DELETE FROM sessoes WHERE id = ?', [id]);
-}
-
-module.exports = { listar, criar, atualizar, deletar };
+module.exports = new SessaoRepository();

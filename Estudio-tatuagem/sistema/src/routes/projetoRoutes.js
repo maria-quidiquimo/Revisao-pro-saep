@@ -1,10 +1,8 @@
-const { Router } = require('express');
-const controller = require('../controllers/projetoController');
+const express = require('express');
+const router = express.Router();
+const auth = require('../middlewares/authMiddleware');
+const projetoController = require('../controllers/projetoController');
 
-const router = Router();
-router.get('/', controller.listar);
-router.post('/', controller.criar);
-router.put('/:id', controller.atualizar);
-router.delete('/:id', controller.deletar);
-
+router.get('/', auth, projetoController.listar);
+router.post('/', auth, projetoController.criar);
 module.exports = router;

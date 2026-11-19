@@ -1,8 +1,16 @@
-const repository = require('../repositories/projetoRepository');
+const projetoRepository = require('../repositories/projetoRepository');
 
-async function listar() { return repository.listar(); }
-async function criar(dados) { return repository.criar(dados); }
-async function atualizar(id, dados) { await repository.atualizar(id, dados); }
-async function deletar(id) { await repository.deletar(id); }
+class ProjetoService {
+    async listar() {
+        return await projetoRepository.listar();
+    }
 
-module.exports = { listar, criar, atualizar, deletar };
+    async cadastrar(dados) {
+        if (!dados.cliente_id) {
+            throw new Error('É obrigatório associar o projeto a um cliente.');
+        }
+        return await projetoRepository.criar(dados);
+    }
+}
+
+module.exports = new ProjetoService();
