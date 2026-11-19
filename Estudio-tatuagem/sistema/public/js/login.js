@@ -1,29 +1,21 @@
-const form = document.getElementById('formLogin');
-const mensagem = document.getElementById('mensagemErro');
+document.getElementById('formLogin').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = document.getElementById('email').value;
+    const senha = document.getElementById('senha').value;
 
-form.addEventListener('submit', async (event) => {
-  event.preventDefault();
-  mensagem.textContent = '';
-
-  try {
-    const response = await fetch('/api/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        email: document.getElementById('email').value,
-        senha: document.getElementById('senha').value
-      })
+    const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, senha })
     });
-    const dados = await response.json();
-    if (!response.ok) {
-      mensagem.textContent = dados.mensagem;
-      return;
+
+    const data = await res.json();
+    if (!res.ok) {
+        document.getElementById('msgErro').innerText = data.erro;
+        return;
     }
 
-    localStorage.setItem('token', dados.token);
-    localStorage.setItem('nome', dados.nome);
-    window.location.href = '/dashboard.html';
-  } catch (error) {
-    mensagem.textContent = 'Não foi possível conectar ao servidor.';
-  }
+    localStorage.setItem('token', data.token);
+    localStorage.setItem('usuario', JSON.stringify(data.usuario));
+    window.location.href = 'dashboard.html';
 });

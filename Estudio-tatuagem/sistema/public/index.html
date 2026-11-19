@@ -1,23 +1,20 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Estúdio de Tatuagem - Login</title>
-  <link rel="stylesheet" href="/css/style.css">
+    <meta charset="UTF-8">
+    <title>Login - InkStudio</title>
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <main class="container">
-    <h1>Estúdio de Tatuagem</h1>
-    <form id="formLogin">
-      <label for="email">E-mail</label>
-      <input id="email" type="email" required>
-      <label for="senha">Senha</label>
-      <input id="senha" type="password" required>
-      <button type="submit">Entrar</button>
-    </form>
-    <p id="mensagemErro" class="erro"></p>
-  </main>
-  <script src="/js/login.js"></script>
+    <div class="login-box">
+        <h2>InkStudio - Acesso</h2>
+        <form id="formLogin">
+            <input type="email" id="email" placeholder="E-mail" required>
+            <input type="password" id="senha" placeholder="Senha" required>
+            <button type="submit" class="primary" style="width:100%">Entrar</button>
+        </form>
+        <p id="msgErro" class="erro"></p>
+    </div>
+    <script src="js/login.js"></script>
 </body>
 </html>

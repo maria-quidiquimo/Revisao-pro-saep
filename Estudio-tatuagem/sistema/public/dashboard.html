@@ -1,21 +1,101 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Estúdio de Tatuagem - Dashboard</title>
-  <link rel="stylesheet" href="/css/style.css">
+    <meta charset="UTF-8">
+    <title>Painel - InkStudio</title>
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <main class="container dashboard">
-    <h1 id="saudacao">Painel</h1>
-    <section class="cards">
-      <article class="card"><h2>Clientes</h2><p id="totalClientes">0</p></article>
-      <article class="card"><h2>Projetos</h2><p id="totalProjetos">0</p></article>
-      <article class="card"><h2>Sessões</h2><p id="totalSessoes">0</p></article>
-    </section>
-    <button id="botaoSair">Sair</button>
-  </main>
-  <script src="/js/dashboard.js"></script>
+    <header>
+        <div><strong>InkStudio</strong> | Bem-vindo(a), <span id="nomeUsuario"></span></div>
+        <nav>
+            <button onclick="mostrarSecao('sessoes')">Sessões</button>
+            <button onclick="mostrarSecao('clientes')">Clientes</button>
+            <button onclick="mostrarSecao('projetos')">Projetos</button>
+            <button class="btn-sair" onclick="sair()">Sair</button>
+        </nav>
+    </header>
+
+    <div class="container">
+        <!-- SEÇÃO SESSÕES -->
+        <section id="sec-sessoes">
+            <h2>Agendamento de Sessões</h2>
+            <form id="formSessao">
+                <select id="sessaoProjeto" required></select>
+                <input type="datetime-local" id="sessaoData" required>
+                <input type="text" id="sessaoObs" placeholder="Observações">
+                <button type="submit" class="primary">Agendar Sessão</button>
+            </form>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Data/Hora</th>
+                        <th>Cliente (Contato / CPF)</th>
+                        <th>Projeto / Local</th>
+                        <th>Valor</th>
+                        <th>Reagendar Data</th>
+                    </tr>
+                </thead>
+                <tbody id="tabelaSessoes"></tbody>
+            </table>
+        </section>
+
+        <!-- SEÇÃO CLIENTES -->
+        <section id="sec-clientes" class="hidden">
+            <h2>Gerenciamento de Clientes</h2>
+            <form id="formCliente">
+                <input type="hidden" id="clienteId">
+                <input type="text" id="clienteNome" placeholder="Nome completo" required>
+                <input type="text" id="clienteCpf" placeholder="CPF (será criptografado)" required>
+                <input type="text" id="clienteTelefone" placeholder="Telefone" required>
+                <input type="email" id="clienteEmail" placeholder="E-mail">
+                <button type="submit" class="primary">Salvar Cliente</button>
+            </form>
+
+            <div class="search-bar">
+                <input type="text" id="termoBusca" placeholder="Buscar cliente por nome, e-mail ou telefone...">
+                <button class="primary" onclick="carregarClientes()">Buscar</button>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>CPF (Descriptografado)</th>
+                        <th>Telefone</th>
+                        <th>E-mail</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="tabelaClientes"></tbody>
+            </table>
+        </section>
+
+        <!-- SEÇÃO PROJETOS -->
+        <section id="sec-projetos" class="hidden">
+            <h2>Projetos de Tatuagem</h2>
+            <form id="formProjeto">
+                <select id="projetoCliente" required></select>
+                <input type="text" id="projetoTitulo" placeholder="Título do Projeto" required>
+                <input type="text" id="projetoLocal" placeholder="Local do Corpo" required>
+                <input type="number" step="0.01" id="projetoValor" placeholder="Valor Estimado (R$)" required>
+                <textarea id="projetoDescricao" placeholder="Descrição detalhada"></textarea>
+                <button type="submit" class="primary">Cadastrar Projeto</button>
+            </form>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Título</th>
+                        <th>Cliente</th>
+                        <th>Local</th>
+                        <th>Valor</th>
+                    </tr>
+                </thead>
+                <tbody id="tabelaProjetos"></tbody>
+            </table>
+        </section>
+    </div>
+
+    <script src="js/dashboard.js"></script>
 </body>
 </html>
