@@ -3,9 +3,9 @@ require('dotenv').config();
 const express = require('express');
 const authMiddleware = require('./middlewares/authMiddleware');
 const authController = require('./controllers/authController');
-const clienteController = require('./controllers/clienteController');
-const agendamentoController = require('./controllers/agendamentoController');
+const clienteService = require('./services/clienteService');
 const veiculoService = require('./services/veiculoService');
+const agendamentoService = require('./services/agendamentoService');
 
 const app = express();
 
@@ -34,10 +34,49 @@ app.post('/login', authController.login);
 
 app.use(authMiddleware);
 
-app.get('/clientes', clienteController.listar);
-app.post('/clientes', clienteController.criar);
-app.put('/clientes/:id', clienteController.atualizar);
-app.delete('/clientes/:id', clienteController.deletar);
+app.get('/clientes', async (req, res) => {
+  try {
+    const clientes = await clienteService.listarOuBuscar(req.query.busca);
+    return res.json(clientes);
+  } catch (erro) {
+    return res
+      .status(erro.status || 500)
+      .json({ mensagem: erro.mensagem || 'Erro interno.' });
+  }
+});
+
+app.post('/clientes', async (req, res) => {
+  try {
+    const clienteCriado = await clienteService.criar(req.body);
+    return res.status(201).json(clienteCriado);
+  } catch (erro) {
+    return res
+      .status(erro.status || 500)
+      .json({ mensagem: erro.mensagem || 'Erro interno.' });
+  }
+});
+
+app.put('/clientes/:id', async (req, res) => {
+  try {
+    const clienteAtualizado = await clienteService.atualizar(req.params.id, req.body);
+    return res.json(clienteAtualizado);
+  } catch (erro) {
+    return res
+      .status(erro.status || 500)
+      .json({ mensagem: erro.mensagem || 'Erro interno.' });
+  }
+});
+
+app.delete('/clientes/:id', async (req, res) => {
+  try {
+    await clienteService.deletar(req.params.id);
+    return res.status(204).send();
+  } catch (erro) {
+    return res
+      .status(erro.status || 500)
+      .json({ mensagem: erro.mensagem || 'Erro interno.' });
+  }
+});
 
 app.get('/veiculos', async (req, res) => {
   try {
@@ -83,9 +122,51 @@ app.delete('/veiculos/:id', async (req, res) => {
   }
 });
 
-app.get('/agendamentos', agendamentoController.listar);
-app.post('/agendamentos', agendamentoController.criar);
-app.put('/agendamentos/:id', agendamentoController.atualizarData);
-app.delete('/agendamentos/:id', agendamentoController.deletar);
+app.get('/agendamentos', async (req, res) => {
+  try {
+    const agendamentos = await agendamentoService.listarComJoin();
+    return res.json(agendamentos);
+  } catch (erro) {
+    return res
+      .status(erro.status || 500)
+      .json({ mensagem: erro.mensagem || 'Erro interno.' });
+  }
+});
+
+app.post('/agendamentos', async (req, res) => {
+  try {
+    const agendamentoCriado = await agendamentoService.criar(req.body);
+    return res.status(201).json(agendamentoCriado);
+  } catch (erro) {
+    return res
+      .status(erro.status || 500)
+      .json({ mensagem: erro.mensagem || 'Erro interno.' });
+  }
+});
+
+app.put('/agendamentos/:id', async (req, res) => {
+  try {
+    const agendamentoAtualizado = await agendamentoService.atualizarData(
+      req.params.id,
+      req.body.data_agendamento
+    );
+    return res.json(agendamentoAtualizado);
+  } catch (erro) {
+    return res
+      .status(erro.status || 500)
+      .json({ mensagem: erro.mensagem || 'Erro interno.' });
+  }
+});
+
+app.delete('/agendamentos/:id', async (req, res) => {
+  try {
+    await agendamentoService.deletar(req.params.id);
+    return res.status(204).send();
+  } catch (erro) {
+    return res
+      .status(erro.status || 500)
+      .json({ mensagem: erro.mensagem || 'Erro interno.' });
+  }
+});
 
 module.exports = app;
