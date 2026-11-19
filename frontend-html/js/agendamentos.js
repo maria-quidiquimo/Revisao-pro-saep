@@ -23,7 +23,7 @@ async function listarAgendamentos() {
     const linha = document.createElement('tr');
     linha.innerHTML = `
       <td>${new Date(agendamento.data_agendamento).toLocaleString('pt-BR')}</td>
-      <td>${agendamento.servico ?? ''}</td>
+      <td>${agendamento.descricao ?? ''}</td>
       <td>${agendamento.placa} - ${agendamento.marca} ${agendamento.modelo}</td>
       <td>${agendamento.cliente_nome}</td>
       <td>
@@ -79,7 +79,7 @@ formAgendamento.addEventListener('submit', async (evento) => {
   const corpo = {
     veiculo_id: campoVeiculo.value,
     data_agendamento: document.getElementById('campoData').value.replace('T', ' '),
-    servico: document.getElementById('campoServico').value,
+    descricao: document.getElementById('campoServico').value,
   };
 
   await apiFetch('/agendamentos', { method: 'POST', body: JSON.stringify(corpo) });

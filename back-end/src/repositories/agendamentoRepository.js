@@ -4,7 +4,7 @@ class AgendamentoRepository {
   async listarComJoin() {
     const query = `
       SELECT 
-        a.id AS agendamento_id,
+        a.id,
         a.data_agendamento,
         a.descricao,
         a.status,

@@ -3,7 +3,8 @@ require('dotenv').config();
 const express = require('express');
 const authMiddleware = require('./middlewares/authMiddleware');
 const authController = require('./controllers/authController');
-const clienteService = require('./services/clienteService');
+const clienteController = require('./controllers/clienteController');
+const agendamentoController = require('./controllers/agendamentoController');
 const veiculoService = require('./services/veiculoService');
 
 const app = express();
@@ -33,16 +34,10 @@ app.post('/login', authController.login);
 
 app.use(authMiddleware);
 
-app.get('/clientes', async (req, res) => {
-  try {
-    const clientes = await clienteService.listarOuBuscar();
-    return res.json(clientes.map(({ id, nome }) => ({ id, nome })));
-  } catch (erro) {
-    return res
-      .status(erro.status || 500)
-      .json({ mensagem: erro.mensagem || 'Erro interno.' });
-  }
-});
+app.get('/clientes', clienteController.listar);
+app.post('/clientes', clienteController.criar);
+app.put('/clientes/:id', clienteController.atualizar);
+app.delete('/clientes/:id', clienteController.deletar);
 
 app.get('/veiculos', async (req, res) => {
   try {
@@ -87,5 +82,10 @@ app.delete('/veiculos/:id', async (req, res) => {
       .json({ mensagem: erro.mensagem || 'Erro interno.' });
   }
 });
+
+app.get('/agendamentos', agendamentoController.listar);
+app.post('/agendamentos', agendamentoController.criar);
+app.put('/agendamentos/:id', agendamentoController.atualizarData);
+app.delete('/agendamentos/:id', agendamentoController.deletar);
 
 module.exports = app;
