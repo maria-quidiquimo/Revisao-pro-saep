@@ -40,7 +40,7 @@ async function listarVeiculos() {
   document.querySelectorAll('.botaoExcluir').forEach((botao) => {
     botao.addEventListener('click', async () => {
       await apiFetch(`/veiculos/${botao.dataset.id}`, { method: 'DELETE' });
-      listarVeiculos();
+      await listarVeiculos();
     });
   });
 }
@@ -100,7 +100,7 @@ formVeiculo.addEventListener('submit', async (evento) => {
   formVeiculo.reset();
   tituloFormulario.textContent = 'Cadastrar veiculo';
   botaoSalvarVeiculo.textContent = 'Cadastrar';
-  listarVeiculos();
+  await listarVeiculos();
 });
 
 listarVeiculos();

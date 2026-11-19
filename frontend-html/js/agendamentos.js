@@ -6,6 +6,7 @@ if (!localStorage.getItem('token')) {
 const tabelaAgendamentos = document.getElementById('tabelaAgendamentos');
 const campoVeiculo = document.getElementById('campoVeiculo');
 const formAgendamento = document.getElementById('formAgendamento');
+const mensagemErro = document.getElementById('mensagemErro');
 
 // Converte a data do banco (string local, sem timezone) para o formato do input datetime-local
 function paraDatetimeLocal(data) {
@@ -41,20 +42,35 @@ async function listarAgendamentos() {
       const id = botao.dataset.id;
       const input = document.querySelector(`input[data-id="${id}"]`);
 
-      await apiFetch(`/agendamentos/${id}`, {
+      const resposta = await apiFetch(`/agendamentos/${id}`, {
         method: 'PUT',
         body: JSON.stringify({ data_agendamento: input.value.replace('T', ' ') }),
       });
+      if (!resposta) return;
 
-      listarAgendamentos();
+      if (!resposta.ok) {
+        const dados = await resposta.json();
+        mensagemErro.textContent = dados.mensagem || 'Não foi possível atualizar o agendamento.';
+        return;
+      }
+
+      await listarAgendamentos();
     });
   });
 
   // Remove o agendamento escolhido
   document.querySelectorAll('.botaoExcluir').forEach((botao) => {
     botao.addEventListener('click', async () => {
-      await apiFetch(`/agendamentos/${botao.dataset.id}`, { method: 'DELETE' });
-      listarAgendamentos();
+      const resposta = await apiFetch(`/agendamentos/${botao.dataset.id}`, { method: 'DELETE' });
+      if (!resposta) return;
+
+      if (!resposta.ok) {
+        const dados = await resposta.json();
+        mensagemErro.textContent = dados.mensagem || 'Não foi possível excluir o agendamento.';
+        return;
+      }
+
+      await listarAgendamentos();
     });
   });
 }
@@ -75,6 +91,7 @@ async function carregarVeiculos() {
 // Cadastra um agendamento associado a um veiculo
 formAgendamento.addEventListener('submit', async (evento) => {
   evento.preventDefault();
+  mensagemErro.textContent = '';
 
   const corpo = {
     veiculo_id: campoVeiculo.value,
@@ -82,9 +99,17 @@ formAgendamento.addEventListener('submit', async (evento) => {
     descricao: document.getElementById('campoServico').value,
   };
 
-  await apiFetch('/agendamentos', { method: 'POST', body: JSON.stringify(corpo) });
+  const resposta = await apiFetch('/agendamentos', { method: 'POST', body: JSON.stringify(corpo) });
+  if (!resposta) return;
+
+  const dados = await resposta.json();
+  if (!resposta.ok) {
+    mensagemErro.textContent = dados.mensagem || 'Não foi possível cadastrar o agendamento.';
+    return;
+  }
+
   formAgendamento.reset();
-  listarAgendamentos();
+  await listarAgendamentos();
 });
 
 listarAgendamentos();

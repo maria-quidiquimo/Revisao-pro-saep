@@ -6,12 +6,36 @@ if (!localStorage.getItem('token')) {
 const tabelaClientes = document.getElementById('tabelaClientes');
 const formCadastrar = document.getElementById('formCadastrar');
 const formEditar = document.getElementById('formEditar');
+const mensagemErro = document.getElementById('mensagemErro');
 
 // Desenha a tabela com os clientes recebidos
-function desenharTabela(clientes) {
+function desenharTabela(clientes, idPrioritario) {
   tabelaClientes.innerHTML = '';
+  const clientesOrdenados = idPrioritario
+    ? [...clientes].sort(
+        (a, b) =>
+          Number(String(b.id) === String(idPrioritario)) -
+          Number(String(a.id) === String(idPrioritario))
+      )
+    : clientes;
+  const nomesExibidos = new Set();
+  const clientesSemDuplicados = clientesOrdenados.filter((cliente) => {
+    const nomeNormalizado = cliente.nome
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .trim()
+      .replace(/\s+/g, ' ')
+      .toLocaleLowerCase('pt-BR');
 
-  clientes.forEach((cliente) => {
+    if (nomesExibidos.has(nomeNormalizado)) {
+      return false;
+    }
+
+    nomesExibidos.add(nomeNormalizado);
+    return true;
+  });
+
+  clientesSemDuplicados.forEach((cliente) => {
     const linha = document.createElement('tr');
     linha.innerHTML = `
       <td>${cliente.nome}</td>
@@ -40,10 +64,18 @@ function desenharTabela(clientes) {
 }
 
 // Busca os clientes na API, com ou sem termo de busca [RN05]
-async function buscarClientes(termo = '') {
+async function buscarClientes(termo = '', idPrioritario) {
   const resposta = await apiFetch(`/clientes?busca=${encodeURIComponent(termo)}`);
+  if (!resposta) return;
+
+  if (!resposta.ok) {
+    const dados = await resposta.json();
+    mensagemErro.textContent = dados.mensagem || 'Não foi possível carregar os clientes.';
+    return;
+  }
+
   const clientes = await resposta.json();
-  desenharTabela(clientes);
+  desenharTabela(clientes, idPrioritario);
 }
 
 // Preenche o formulario de edicao com os dados do cliente escolhido
@@ -63,6 +95,7 @@ document.getElementById('botaoBuscar').addEventListener('click', () => {
 // Cadastra um novo cliente [RN03]
 formCadastrar.addEventListener('submit', async (evento) => {
   evento.preventDefault();
+  mensagemErro.textContent = '';
 
   const corpo = {
     nome: document.getElementById('cadastrarNome').value,
@@ -71,14 +104,23 @@ formCadastrar.addEventListener('submit', async (evento) => {
     email: document.getElementById('cadastrarEmail').value,
   };
 
-  await apiFetch('/clientes', { method: 'POST', body: JSON.stringify(corpo) });
+  const resposta = await apiFetch('/clientes', { method: 'POST', body: JSON.stringify(corpo) });
+  if (!resposta) return;
+
+  const dados = await resposta.json();
+  if (!resposta.ok) {
+    mensagemErro.textContent = dados.mensagem || 'Não foi possível cadastrar o cliente.';
+    return;
+  }
+
   formCadastrar.reset();
-  buscarClientes();
+  await buscarClientes('', dados.id);
 });
 
 // Salva a edicao do cliente [RN06]
 formEditar.addEventListener('submit', async (evento) => {
   evento.preventDefault();
+  mensagemErro.textContent = '';
 
   const id = document.getElementById('editarId').value;
   const corpo = {
@@ -88,9 +130,17 @@ formEditar.addEventListener('submit', async (evento) => {
     email: document.getElementById('editarEmail').value,
   };
 
-  await apiFetch(`/clientes/${id}`, { method: 'PUT', body: JSON.stringify(corpo) });
+  const resposta = await apiFetch(`/clientes/${id}`, { method: 'PUT', body: JSON.stringify(corpo) });
+  if (!resposta) return;
+
+  const dados = await resposta.json();
+  if (!resposta.ok) {
+    mensagemErro.textContent = dados.mensagem || 'Não foi possível atualizar o cliente.';
+    return;
+  }
+
   formEditar.reset();
-  buscarClientes();
+  await buscarClientes();
 });
 
 buscarClientes();
